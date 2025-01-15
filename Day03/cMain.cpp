@@ -6,10 +6,18 @@ void SetPosition(int x, int y);
 #pragma endregion
 
 struct Obj
-{
+{	
 	int x;
 	int y;
 	const char* shape[3];
+};
+
+struct Bullet
+{
+	bool act;
+	int x;
+	int y;
+	const char* shape;
 };
 
 
@@ -22,45 +30,62 @@ int main()
 	obj.shape[1] = "*>=====[_]L)";
 	obj.shape[2] = "      -'-`-";
 
+	Bullet bullet;
+	bullet.act = false;
+	bullet.x = 0;
+	bullet.y = 0;
+	bullet.shape = "¡Ü";
+
 	while (true)
 	{
 		system("cls");	
-
-		//W == UP
 		if (GetAsyncKeyState(0x57))
 		{
 			obj.y--;
 		}
-
-		//A == LEFT
 		if (GetAsyncKeyState(0x41))
 		{
 			obj.x--;
 		}
 
-		//S == DOWN
 		if (GetAsyncKeyState(0x53))
 		{
 			obj.y++;
 		}
-
-		//D == RIGHT
 		if (GetAsyncKeyState(0x44))
 		{
 			obj.x++;
+		}
+
+		if (GetAsyncKeyState(VK_SPACE))
+		{
+			if (bullet.act == false)
+			{
+				bullet.x = obj.x + 6;
+				bullet.y = obj.y + 1;
+
+				bullet.act = true;
+			}
+		
 		}
 
 
 		
 		for (int i = 0; i < 3; i++)
 		{
-			//obj.y == 10;
-			//obj.y + i(0) == 10
-			//obj.y + i(1) == 11
-			//obj.y + i(2) == 12
 			SetPosition(obj.x, obj.y + i);
 			printf(obj.shape[i]);
 		}
+
+		//bullet.act == true
+		if (bullet.act)
+		{
+			bullet.x++;
+
+		}
+
+		SetPosition(bullet.x, bullet.y);
+		printf(bullet.shape);
 	
 
 		Sleep(50);
