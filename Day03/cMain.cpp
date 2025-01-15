@@ -5,36 +5,58 @@
 void SetPosition(int x, int y);
 #pragma endregion
 
-struct Obj
+#define Bullet_Count 10
+#define Enemy_Count 3
+
+typedef struct Obj1
 {	
 	int x;
 	int y;
 	const char* shape[3];
-};
+}Obj;
 
-struct Bullet
+typedef struct Obj2 
 {
 	bool act;
+	int hp;
 	int x;
 	int y;
 	const char* shape;
-};
+}Bullet, Enemy;
 
 
 int main()
 {
 	Obj obj;
-	obj.x = 10;
+	obj.x = 2;
 	obj.y = 10;
 	obj.shape[0] = "   -----|-----";
 	obj.shape[1] = "*>=====[_]L)";
 	obj.shape[2] = "      -'-`-";
 
-	Bullet bullet;
-	bullet.act = false;
-	bullet.x = 0;
-	bullet.y = 0;
-	bullet.shape = "●";
+	Bullet bullets[Bullet_Count];
+	for (int i = 0; i < Bullet_Count; i++)
+	{
+		//i == 0, 1, 2
+		//bullets[0],bullets[1],bullets[2]
+		bullets[i].act = false;
+		bullets[i].x = i;
+		bullets[i].y = 0;
+		bullets[i].shape = "●";
+	}
+
+
+	Enemy enemies[Enemy_Count];
+	for (int i = 0; i < Enemy_Count; i++)
+	{
+		enemies[i].act = true;
+		enemies[i].x = rand() % 29 + 10;
+		enemies[i].y = rand() % 30;
+		enemies[i].shape = "봇";
+		enemies[i].hp = 3;
+	}
+
+
 
 	while (true)
 	{
@@ -59,14 +81,17 @@ int main()
 
 		if (GetAsyncKeyState(VK_SPACE))
 		{
-			if (bullet.act == false)
+			for (int i = 0; i < Bullet_Count; i++)
 			{
-				bullet.x = obj.x + 6;
-				bullet.y = obj.y + 1;
+				if (bullets[i].act == false)
+				{
+					bullets[i].x = obj.x + 6;
+					bullets[i].y = obj.y + 1;
 
-				bullet.act = true;
+					bullets[i].act = true;
+					break; // for루프 빠져 나감
+				}
 			}
-		
 		}
 
 
@@ -77,16 +102,71 @@ int main()
 			printf(obj.shape[i]);
 		}
 
-		//bullet.act == true
-		if (bullet.act)
-		{
-			bullet.x++;
 
+		for (int i = 0; i < Bullet_Count; i++)
+		{
+			if (bullets[i].act == true)
+			{
+				bullets[i].x++;
+
+				if (bullets[i].x >= 40)
+				{
+					bullets[i].act = false;
+					bullets[i].y = 0;
+					bullets[i].x = i;
+				}
+
+				for (int j = 0; j < Enemy_Count; j++)
+				{
+					if (enemies[j].act)
+					{
+						if (enemies[j].x == bullets[i].x && enemies[j].y == bullets[i].y)
+						{
+							if (enemies[j].hp > 0)
+							{
+								enemies[j].hp--;
+							}
+							else
+							{
+								enemies[j].act = false;
+								enemies[i].hp = 3;
+							}
+
+
+							bullets[i].act = false;
+							
+						}
+					}
+				}
+			}
+
+
+			SetPosition(bullets[i].x, bullets[i].y);
+			printf(bullets[i].shape);
 		}
 
-		SetPosition(bullet.x, bullet.y);
-		printf(bullet.shape);
+		for (int i = 0; i < Enemy_Count; i++)
+		{
+			if (enemies[i].act == false)
+			{
+				enemies[i].act = true;
+				enemies[i].x = rand() % 29 + 10;
+				enemies[i].y = rand() % 30;
+		
+				break;
+			}
+		}
+
 	
+		for (int i = 0; i < Enemy_Count; i++)
+		{
+			if (enemies[i].act)
+			{
+				SetPosition(enemies[i].x, enemies[i].y);
+				printf(enemies[i].shape);
+			}
+		}
+
 
 		Sleep(50);
 	}
